@@ -35,6 +35,7 @@
 #define SAI_DB_SQL_SCRIPT_PATH "sql_script_path"
 #define SAI_DB_CREATE_SCRIPT   "create_script"
 #define SAI_DB_DELETE_SCRIPT   "delete_script"
+#define SAI_DB_MAX_DIR_SIZE    256 
 
 db_sql_handle_t db = NULL;
 
@@ -47,8 +48,12 @@ sai_status_t sai_vm_db_init (void)
         "sai_db_acl_cfg"};
     uint_t                 num_obj_grp =
         sizeof (obj_grp_name)/ sizeof (*obj_grp_name);
+    char str[SAI_DB_MAX_DIR_SIZE];
 
-    if ((std_config_file_open (&cfg_file_handle, SAI_DB_CONFIG_FILE)) !=
+    snprintf(str, SAI_DB_MAX_DIR_SIZE, "%s%s", (getenv("OPX_DATA_PATH") ? getenv("OPX_DATA_PATH") : ""), 
+             SAI_DB_CONFIG_FILE);
+
+    if ((std_config_file_open (&cfg_file_handle, str)) !=
         STD_ERR_OK) {
         SAI_VM_DB_LOG_ERR ("Missing SAI VM DB config file: %s.",
                            SAI_DB_CONFIG_FILE);
@@ -66,7 +71,7 @@ sai_status_t sai_vm_db_init (void)
 
     if ((db_path == NULL) || (sql_script_path == NULL)) {
         SAI_VM_DB_LOG_ERR ("Error Parsing SAI VM DB config file: %s, group: %s",
-                           SAI_DB_CONFIG_FILE, SAI_DB_SQL_SCRIPT_PATH);
+                           str, SAI_DB_SQL_SCRIPT_PATH);
 
         return SAI_STATUS_FAILURE;
     }
@@ -82,7 +87,7 @@ sai_status_t sai_vm_db_init (void)
 
         if ((create_script == NULL) || (delete_script == NULL)) {
             SAI_VM_DB_LOG_ERR ("Error Parsing SAI VM DB config file: %s, "
-                               "group: %s.", SAI_DB_CONFIG_FILE,
+                               "group: %s.", str,
                                obj_grp_name [grp_idx]);
 
             return SAI_STATUS_FAILURE;
