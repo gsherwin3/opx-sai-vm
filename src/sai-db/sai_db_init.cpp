@@ -47,9 +47,9 @@ sai_status_t sai_vm_db_init (void)
     static const char     *obj_grp_name [] = {
         "sai_db_switch_cfg", "sai_db_route_cfg", "sai_db_switching_cfg",
         "sai_db_acl_cfg"};
+    char str[SAI_DB_MAX_DIR_SIZE];
     uint_t                 num_obj_grp =
         sizeof (obj_grp_name)/ sizeof (*obj_grp_name);
-    char str[SAI_DB_MAX_DIR_SIZE];
 
     snprintf(str, SAI_DB_MAX_DIR_SIZE, "%s%s", (getenv("OPX_DATA_PATH") ? getenv("OPX_DATA_PATH") : ""), 
              SAI_DB_CONFIG_FILE);
@@ -114,7 +114,7 @@ sai_status_t sai_vm_db_init (void)
         }
     }
 
-    std_config_file_close (cfg_file_handle);
+    // EXTREME_HACK std_config_file_close (cfg_file_handle);
 
     if (db_sql_open ((void **)&db, std::string(db_path).c_str())
         != STD_ERR_OK) {
